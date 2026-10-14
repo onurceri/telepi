@@ -1,0 +1,2 @@
+{ "name": "openshell-grpc-spike", "private": true, "type": "module",
+  "dependencies": { "@grpc/grpc-js": "1.12.6", "@grpc/proto-loader": "0.7.15" } }

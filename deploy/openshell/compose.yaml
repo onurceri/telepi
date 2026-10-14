@@ -1,0 +1,75 @@
+name: telepi-openshell
+
+services:
+  init:
+    image: ghcr.io/nvidia/openshell/gateway:0.1.3
+    user: "0"
+    restart: "no"
+    command: ["generate-certs", "--output-dir", "/var/lib/openshell/tls"]
+    environment: { HOME: /var/lib/openshell }
+    volumes: &data
+      - type: bind
+        source: /var/lib/openshell
+        target: /var/lib/openshell
+        bind: { create_host_path: true }
+
+  gateway:
+    image: ghcr.io/nvidia/openshell/gateway:0.1.3
+    container_name: openshell-gateway
+    restart: unless-stopped
+    depends_on: { init: { condition: service_completed_successfully } }
+    command: []
+    user: "0"
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - type: bind
+        source: /var/lib/openshell
+        target: /var/lib/openshell
+        bind: { create_host_path: true }
+      # Host directories that sandboxes may bind-mount. The gateway checks that the bind source
+      # exists inside ITS OWN filesystem, and Docker resolves it on the daemon host, so each path
+      # must be identical on both sides.
+      # TELEPI_WORKSPACES: where the telepi server clones task workspaces (the server's TELEPI_WORKSPACES).
+      - type: bind
+        source: ${TELEPI_WORKSPACES:?set in .env}
+        target: ${TELEPI_WORKSPACES}
+        bind: { create_host_path: true }
+      # TELEPI_REMOTES: a directory (or a single bare repo) holding project remotes that are local paths,
+      # so that `git push` from inside a sandbox can reach them. Set it to any existing path if there are none.
+      - type: bind
+        source: ${TELEPI_REMOTES:?set in .env}
+        target: ${TELEPI_REMOTES}
+      - { type: bind, source: ./gateway.toml, target: /etc/openshell/gateway.toml, read_only: true }
+      # Server certificate and key, and the CA that client certificates must chain to (./gen-certs.sh).
+      - { type: bind, source: ./tls, target: /etc/openshell/tls, read_only: true }
+    environment:
+      OPENSHELL_GATEWAY_CONFIG: /etc/openshell/gateway.toml
+      OPENSHELL_DB_URL: "sqlite:/var/lib/openshell/gateway.db?mode=rwc"
+      XDG_DATA_HOME: /var/lib/openshell
+      HOME: /var/lib/openshell
+
+  # Throwaway "external service": echoes request method, path and headers as JSON.
+  echo:
+    image: node:22-bookworm-slim
+    container_name: openshell-echo
+    profiles: [spike]
+    command:
+      - node
+      - -e
+      - |
+        require('http').createServer((q,r)=>{let b='';q.on('data',d=>b+=d);q.on('end',()=>{
+        const o={method:q.method,url:q.url,headers:q.headers,body:b};console.log(JSON.stringify(o));
+        r.setHeader('content-type','application/json');r.end(JSON.stringify(o))})}).listen(9000,'0.0.0.0')
+
+  # openshell CLI client (static binary built from the pinned release). Not a daemon.
+  cli:
+    build: { context: ., dockerfile: Dockerfile.cli, args: { OPENSHELL_VERSION: "0.1.3" } }
+    image: telepi-openshell-cli:0.1.3
+    profiles: [tools]
+    volumes:
+      - ./tls/cli:/root/.config/openshell:ro
+      - ./work:/work
+    working_dir: /work

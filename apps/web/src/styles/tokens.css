@@ -1,0 +1,88 @@
+/* Design tokens.
+   The language is plain on purpose: black, white, hairlines, one typeface family.
+   Colour is never decoration. It appears only as state: blue = running, amber = waiting on you,
+   green = done, red = destructive or failed. The primary action is ink, not a colour. */
+:root {
+  --bg: #fafafa;
+  --screen: #ffffff;
+  --raise: #f5f5f5;
+  --ink: #171717;
+  --muted: #595959;
+  --faint: #6f6f6f;
+  --line: #eaeaea;
+  --line-strong: #d4d4d4;
+
+  --run: #0068d6;
+  --run-bg: #ebf5ff;
+  --ok: #297a3a;
+  --ok-bg: #eefaf0;
+  --wait: #a35200;
+  --wait-bg: #fff6e5;
+  --fail: #cb2a2f;
+  --fail-bg: #ffeeee;
+
+  --sans: "Geist Variable", "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono Variable", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --r-sm: 6px;
+  --r: 8px;
+  --r-lg: 12px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px rgb(0 0 0 / 0.08);
+  --ring: rgb(23 23 23 / 0.1);
+  --scrim: rgb(0 0 0 / 0.4);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --screen: #0a0a0a;
+    --raise: #141414;
+    --ink: #ededed;
+    --muted: #a1a1a1;
+    --faint: #878787;
+    --line: #232323;
+    --line-strong: #333333;
+
+    --run: #52a8ff;
+    --run-bg: #06193a;
+    --ok: #62c073;
+    --ok-bg: #0b2112;
+    --wait: #ff990a;
+    --wait-bg: #2a1700;
+    --fail: #ff6166;
+    --fail-bg: #330a0c;
+
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.6);
+    --ring: rgb(237 237 237 / 0.14);
+    --scrim: rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+
+/* The same dark values when dark is chosen in Settings, whatever the system says. */
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --screen: #0a0a0a;
+  --raise: #141414;
+  --ink: #ededed;
+  --muted: #a1a1a1;
+  --faint: #878787;
+  --line: #232323;
+  --line-strong: #333333;
+
+  --run: #52a8ff;
+  --run-bg: #06193a;
+  --ok: #62c073;
+  --ok-bg: #0b2112;
+  --wait: #ff990a;
+  --wait-bg: #2a1700;
+  --fail: #ff6166;
+  --fail-bg: #330a0c;
+
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 24px rgb(0 0 0 / 0.6);
+  --ring: rgb(237 237 237 / 0.14);
+  --scrim: rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}

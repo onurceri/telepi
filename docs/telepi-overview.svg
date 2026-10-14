@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 446" width="1000" height="446" role="img" aria-label="telepi: your phone talks to a thin server on your machine; Pi Durable runs the agent loop there; every command runs in an OpenShell sandbox that holds no secrets; reads from approved sites pass, sending data asks you, unknown hosts are blocked, and the GitHub token is added on the wire only while you publish.">
+  <style>
+    .bg { fill: #ffffff; }
+    .ink { fill: #171717; }
+    .muted { fill: #5c5c5c; }
+    .line { stroke: #d4d4d4; }
+    .panel { fill: #fafafa; stroke: #e5e5e5; }
+    .card { fill: #ffffff; stroke: #e5e5e5; }
+    .run { fill: #0068d6; } .run-s { stroke: #0068d6; } .run-bg { fill: #ebf5ff; }
+    .ok { fill: #297a3a; } .ok-s { stroke: #297a3a; } .ok-bg { fill: #eefaf0; }
+    .wait { fill: #a35200; } .wait-s { stroke: #a35200; } .wait-bg { fill: #fff6e5; }
+    .fail { fill: #cb2a2f; } .fail-s { stroke: #cb2a2f; } .fail-bg { fill: #ffeeee; }
+    .violet { fill: #6e3bd1; } .violet-s { stroke: #6e3bd1; } .violet-bg { fill: #f4efff; }
+    .phone { fill: #171717; }
+    .screen { fill: #ffffff; }
+    text { font-family: ui-sans-serif, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+    .h { font-size: 15px; font-weight: 650; }
+    .t { font-size: 13px; }
+    .s { font-size: 11.5px; }
+    .cap { font-size: 11px; font-weight: 650; letter-spacing: 0.08em; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0a0a0a; }
+      .ink { fill: #ededed; }
+      .muted { fill: #a1a1a1; }
+      .line { stroke: #333333; }
+      .panel { fill: #111111; stroke: #262626; }
+      .card { fill: #161616; stroke: #2a2a2a; }
+      .run { fill: #52a8ff; } .run-s { stroke: #52a8ff; } .run-bg { fill: #0b1d38; }
+      .ok { fill: #62c073; } .ok-s { stroke: #62c073; } .ok-bg { fill: #0d2414; }
+      .wait { fill: #ff990a; } .wait-s { stroke: #ff990a; } .wait-bg { fill: #2c1a03; }
+      .fail { fill: #ff6166; } .fail-s { stroke: #ff6166; } .fail-bg { fill: #350d0f; }
+      .violet { fill: #a98bff; } .violet-s { stroke: #a98bff; } .violet-bg { fill: #1d1433; }
+      .phone { fill: #2a2a2a; }
+      .screen { fill: #0f0f0f; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" class="muted"/>
+    </marker>
+    <marker id="aok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="ok"/></marker>
+    <marker id="await" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="wait"/></marker>
+    <marker id="afail" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="fail"/></marker>
+    <marker id="aviolet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="violet"/></marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1000" height="446" rx="18"/>
+
+  <!-- ===== Phone ===== -->
+  <text class="cap muted" x="32" y="40">YOUR PHONE</text>
+  <rect class="phone" x="24" y="52" width="176" height="336" rx="28"/>
+  <rect class="screen" x="32" y="64" width="160" height="312" rx="20"/>
+  <rect class="phone" x="88" y="70" width="48" height="6" rx="3"/>
+  <text class="h ink" x="44" y="102">Needs you</text>
+
+  <rect class="wait-bg" x="42" y="114" width="140" height="112" rx="10"/>
+  <circle class="wait" cx="54" cy="128" r="4"/>
+  <text class="s wait" x="63" y="132" font-weight="650">Waiting on you</text>
+  <text class="t ink" x="50" y="153" font-weight="600">Send data to</text>
+  <text class="t ink" x="50" y="170" font-weight="600">github.com?</text>
+  <text class="s mono muted" x="50" y="188">POST /…/pulls</text>
+  <rect class="card" x="50" y="198" width="58" height="20" rx="6"/>
+  <text class="s ink" x="79" y="212" text-anchor="middle">Deny</text>
+  <rect class="ink" x="114" y="198" width="60" height="20" rx="6"/>
+  <text class="s bg" x="144" y="212" text-anchor="middle" font-weight="650">Allow</text>
+
+  <rect class="ok-bg" x="42" y="236" width="140" height="58" rx="10"/>
+  <circle class="ok" cx="54" cy="250" r="4"/>
+  <text class="s ok" x="63" y="254" font-weight="650">Done · review</text>
+  <text class="s ink" x="50" y="274">4 files · $0.01</text>
+  <text class="s ink" x="50" y="288" font-weight="650">Open PR →</text>
+
+  <rect class="run-bg" x="42" y="304" width="140" height="58" rx="10"/>
+  <circle class="run" cx="54" cy="318" r="4"/>
+  <text class="s run" x="63" y="322" font-weight="650">Running</text>
+  <text class="s ink" x="50" y="342">Fix the flaky test</text>
+  <text class="s muted" x="50" y="356">ran npm test · 12 s</text>
+
+  <!-- phone <-> server -->
+  <line class="line" x1="206" y1="220" x2="252" y2="220" stroke-width="1.6" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="s muted" x="229" y="208" text-anchor="middle">Tailscale</text>
+  <text class="s muted" x="229" y="238" text-anchor="middle">only you</text>
+
+  <!-- ===== Trusted side ===== -->
+  <text class="cap muted" x="262" y="40">YOUR MACHINE · TRUSTED SIDE</text>
+  <rect class="panel" x="256" y="52" width="252" height="336" rx="14" stroke-width="1"/>
+
+  <rect class="card" x="272" y="68" width="220" height="62" rx="10"/>
+  <text class="h ink" x="288" y="94">telepi server</text>
+  <text class="s muted" x="288" y="114">pairing · notifications · reviews</text>
+
+  <rect class="card" x="272" y="142" width="220" height="62" rx="10"/>
+  <text class="h ink" x="288" y="168">Pi Durable</text>
+  <text class="s muted" x="288" y="188">the agent loop · survives restarts</text>
+
+  <rect class="card" x="272" y="216" width="220" height="62" rx="10"/>
+  <text class="h ink" x="288" y="242">Pi login &amp; model</text>
+  <text class="s muted" x="288" y="262">local, subscription or API key</text>
+
+  <rect class="violet-bg" x="272" y="290" width="220" height="82" rx="10"/>
+  <text class="h violet" x="288" y="316">OpenShell gateway</text>
+  <text class="s muted" x="288" y="336">holds your GitHub token</text>
+  <text class="s muted" x="288" y="354">attaches it only to publish</text>
+
+  <!-- server -> sandbox -->
+  <line class="line" x1="508" y1="175" x2="554" y2="175" stroke-width="1.6" marker-end="url(#a)"/>
+  <text class="s muted" x="531" y="163" text-anchor="middle">every</text>
+  <text class="s muted" x="531" y="193" text-anchor="middle">command</text>
+
+  <!-- ===== Sandbox ===== -->
+  <text class="cap run" x="566" y="40">SANDBOX · ONE PER TASK</text>
+  <rect class="run-bg" x="558" y="52" width="232" height="336" rx="14"/>
+  <rect x="558" y="52" width="232" height="336" rx="14" fill="none" class="run-s" stroke-width="2.5" stroke-dasharray="7 5"/>
+
+  <text class="t ink" x="574" y="84" font-weight="650">Runs anything, asks nothing</text>
+  <rect class="card" x="574" y="96" width="200" height="88" rx="8"/>
+  <text class="s mono ink" x="586" y="118">$ npm install</text>
+  <text class="s mono ink" x="586" y="138">$ rm -rf dist</text>
+  <text class="s mono ink" x="586" y="158">$ npm test</text>
+  <text class="s mono ink" x="586" y="176">$ git commit</text>
+  <text class="s ok" x="762" y="118" text-anchor="end">✓</text>
+  <text class="s ok" x="762" y="138" text-anchor="end">✓</text>
+  <text class="s ok" x="762" y="158" text-anchor="end">✓</text>
+  <text class="s ok" x="762" y="176" text-anchor="end">✓</text>
+
+  <text class="s ink" x="574" y="210" font-weight="650">Sees only the task's clone</text>
+  <text class="s muted" x="574" y="226">not your home folder, not other repos</text>
+  <text class="s ink" x="574" y="252" font-weight="650">Holds no secrets</text>
+  <text class="s mono muted" x="574" y="268">$GITHUB_TOKEN = placeholder</text>
+  <text class="s ink" x="574" y="294" font-weight="650">Locked by the kernel</text>
+  <text class="s muted" x="574" y="310">Landlock · seccomp · no capabilities</text>
+  <text class="s ink" x="574" y="336" font-weight="650">Network closed by default</text>
+  <text class="s muted" x="574" y="352">every request goes through the proxy →</text>
+
+  <!-- proxy gate -->
+  <rect class="run" x="786" y="96" width="10" height="276" rx="5"/>
+  <text class="cap run" x="809" y="234" transform="rotate(-90 809 234)" text-anchor="middle">EGRESS PROXY</text>
+
+  <!-- ===== Internet ===== -->
+  <text class="cap muted" x="836" y="40">THE INTERNET</text>
+
+  <line x1="818" y1="122" x2="834" y2="122" class="ok-s" stroke-width="1.8" marker-end="url(#aok)"/>
+  <rect class="ok-bg" x="838" y="96" width="146" height="58" rx="10"/>
+  <text class="s ok" x="850" y="116" font-weight="650">✓ Read</text>
+  <text class="s mono ink" x="850" y="133">GET github.com</text>
+  <text class="s muted" x="850" y="147">after one tap</text>
+
+  <line x1="818" y1="190" x2="834" y2="190" class="wait-s" stroke-width="1.8" marker-end="url(#await)"/>
+  <rect class="wait-bg" x="838" y="164" width="146" height="58" rx="10"/>
+  <text class="s wait" x="850" y="184" font-weight="650">? Send</text>
+  <text class="s mono ink" x="850" y="201">POST, git push</text>
+  <text class="s muted" x="850" y="215">asks you, every time</text>
+
+  <line x1="818" y1="258" x2="834" y2="258" class="fail-s" stroke-width="1.8" marker-end="url(#afail)"/>
+  <rect class="fail-bg" x="838" y="232" width="146" height="58" rx="10"/>
+  <text class="s fail" x="850" y="252" font-weight="650">✕ Unknown site</text>
+  <text class="s mono ink" x="850" y="269">evil.example</text>
+  <text class="s muted" x="850" y="283">blocked until you allow</text>
+
+  <line x1="818" y1="326" x2="834" y2="326" class="violet-s" stroke-width="1.8" marker-end="url(#aviolet)"/>
+  <rect class="violet-bg" x="838" y="300" width="146" height="72" rx="10"/>
+  <text class="s violet" x="850" y="320" font-weight="650">↑ Publish</text>
+  <text class="s ink" x="850" y="337">real token added</text>
+  <text class="s ink" x="850" y="351">on the wire, only</text>
+  <text class="s ink" x="850" y="365">while you publish</text>
+
+  <!-- gateway -> proxy: token path -->
+  <path d="M492 352 C 540 420, 760 420, 791 376" fill="none" class="violet-s" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#aviolet)"/>
+  <text class="s violet" x="640" y="428" text-anchor="middle">the token never enters the sandbox</text>
+
+</svg>

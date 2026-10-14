@@ -1,0 +1,22 @@
+{
+  "name": "telepi",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "telepi": "node scripts/telepi.mjs",
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "qrcode-terminal": "0.12.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

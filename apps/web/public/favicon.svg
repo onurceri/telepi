@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- telepi: Pi, locked in. -->
+  <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+  <rect x=".5" y=".5" width="63" height="63" rx="13.5" fill="none" stroke="#fff" stroke-opacity=".14"/>
+  <path d="M22.5 28 V21 a9.5 9.5 0 0 1 19 0 V28" fill="none" stroke="#fff" stroke-width="5"/>
+  <rect x="14" y="27" width="36" height="26" rx="6" fill="#fff"/>
+  <path d="M21.5 34.5 H42.5 M27.5 34.5 V47" stroke="#0a0a0a" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M36.5 34.5 V43.5 q0 3.5 3.5 3.5" fill="none" stroke="#0a0a0a" stroke-width="4.5" stroke-linecap="round"/>
+</svg>

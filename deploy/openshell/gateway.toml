@@ -1,0 +1,45 @@
+[openshell]
+version = 2
+
+[openshell.gateway]
+bind_address        = "0.0.0.0:8080"
+health_bind_address = "0.0.0.0:8081"
+log_level           = "info"
+compute_driver      = "docker"
+# Sandbox supervisors check the gateway's server certificate against this CA (the Docker driver passes its content on).
+guest_tls_ca        = "/etc/openshell/tls/ca.crt"
+
+# Mutual TLS. Made by ./gen-certs.sh; compose mounts tls/ at /etc/openshell/tls. A caller needs a client certificate
+# signed by this CA. Supervisors do not use one: they authenticate with a token the gateway gives their sandbox.
+[openshell.gateway.tls]
+cert_path      = "/etc/openshell/tls/server.crt"
+key_path       = "/etc/openshell/tls/server.key"
+client_ca_path = "/etc/openshell/tls/ca.crt"
+
+[openshell.gateway.auth]
+allow_unauthenticated_users = false
+
+# The verified certificate becomes the caller's identity: CN is the user, OU the roles.
+[openshell.gateway.mtls_auth]
+enabled = true
+
+[openshell.gateway.gateway_jwt]
+signing_key_path = "/var/lib/openshell/tls/jwt/signing.pem"
+public_key_path  = "/var/lib/openshell/tls/jwt/public.pem"
+kid_path         = "/var/lib/openshell/tls/jwt/kid"
+gateway_id       = "telepi-openshell"
+
+[openshell.drivers.docker]
+default_image         = "node:22-bookworm"
+sandbox_runtime_image = "ghcr.io/nvidia/openshell/sandbox:0.1.3"
+supervisor_image      = "ghcr.io/nvidia/openshell/supervisor:0.1.3"
+image_pull_policy     = "if_not_present"
+sandbox_label         = "telepi-openshell"
+app_armor_profile     = "Unconfined"
+# Required to bind-mount host directories into sandboxes via --driver-config-json.
+# Bind mounts bypass workspace isolation and filesystem policy for that path.
+allow_driver_config = true
+enable_bind_mounts  = true
+
+[openshell.drivers.docker.resource_admission]
+enabled = false

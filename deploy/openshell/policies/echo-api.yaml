@@ -1,0 +1,19 @@
+# Spike profile: credential ECHO_TOKEN may only be injected for requests to echo.test:9000.
+id: echo-api
+display_name: Echo API
+description: Spike echo service (credential injection test)
+category: other
+credentials:
+  - name: api_token
+    description: Echo API token
+    env_vars: [ECHO_TOKEN]
+    required: true
+    auth_style: bearer
+    header_name: authorization
+endpoints:
+  - host: openshell-echo.orb.local
+    port: 9000
+    protocol: rest
+    access: full
+    enforcement: enforce
+binaries: [/usr/bin/curl]

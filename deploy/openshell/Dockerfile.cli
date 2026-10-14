@@ -1,0 +1,8 @@
+# openshell CLI (static musl binary) from the pinned GitHub release. No host install.
+FROM debian:bookworm-slim
+ARG OPENSHELL_VERSION=0.1.3
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl git jq openssh-client && rm -rf /var/lib/apt/lists/*
+RUN set -eux; arch="$(uname -m)"; \
+    curl -fsSL -o /tmp/os.tgz "https://github.com/NVIDIA/OpenShell/releases/download/v${OPENSHELL_VERSION}/openshell-${arch}-unknown-linux-musl.tar.gz"; \
+    tar -xzf /tmp/os.tgz -C /usr/local/bin; rm /tmp/os.tgz; chmod +x /usr/local/bin/openshell; openshell --version
+ENTRYPOINT ["openshell"]

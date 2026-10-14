@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>telepi Architecture</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: single column. Architecture figure, approval path figure, then three plain lists. */
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --zone: #f1f1f1;
+    --fg: #171717;
+    --muted: #595959;
+    --line: #c9c9c9;
+    --ours: #a35200;
+    --ours-soft: #fff1dc;
+    --ask: #0068d6;
+    --ask-soft: #e6f1ff;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0a0a0a; --surface: #161616; --zone: #111111; --fg: #ededed;
+      --muted: #a1a1a1; --line: #3a3a3a; --ours: #ffa940; --ours-soft: #2e1c05;
+      --ask: #52a8ff; --ask-soft: #0a2140;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0a0a; --surface: #161616; --zone: #111111; --fg: #ededed;
+    --muted: #a1a1a1; --line: #3a3a3a; --ours: #ffa940; --ours-soft: #2e1c05;
+    --ask: #52a8ff; --ask-soft: #0a2140;
+    color-scheme: dark;
+  }
+
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 16px; line-height: 1.55; }
+  .page { max-width: 1500px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 44px; }
+  .prose { max-width: 68ch; display: flex; flex-direction: column; gap: 12px; }
+  h1 { font-size: 1.75rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+  h2 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+  p { margin: 0; }
+  .lede { color: var(--muted); }
+
+  figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  .scroll { overflow-x: auto; }
+  .scroll svg { display: block; width: 100%; height: auto; color: var(--fg); font-family: var(--sans); }
+  .arch svg { min-width: 1240px; }
+  .path svg { min-width: 1040px; max-width: 1280px; }
+  figcaption { color: var(--muted); font-size: 0.9rem; max-width: 76ch; }
+
+  .host { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+  .zone { fill: var(--zone); stroke: var(--line); stroke-width: 1.5; }
+  .box { fill: var(--surface); stroke: var(--fg); stroke-width: 1.25; }
+  .ours { fill: var(--ours-soft); stroke: var(--ours); stroke-width: 1.75; }
+  .sandbox { fill: var(--surface); stroke: var(--fg); stroke-width: 1.25; stroke-dasharray: 6 4; }
+  .b-ask { fill: var(--ask-soft); stroke: var(--ask); stroke-width: 1.75; }
+  .wire { stroke: var(--fg); stroke-width: 1.5; fill: none; }
+  .wire-in { stroke: var(--ask); stroke-width: 2.75; fill: none; }
+  .wire-ask { stroke: var(--ask); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+  .ah { fill: var(--fg); } .ah-ask { fill: var(--ask); }
+  .t { font-size: 14px; font-weight: 600; fill: var(--fg); text-anchor: middle; }
+  .t-sm { font-size: 13px; }
+  .t-ours { fill: var(--ours); }
+  .s { font-size: 12.5px; fill: var(--muted); text-anchor: middle; }
+  .s-sm { font-size: 11.5px; }
+  .tag { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); text-anchor: middle; }
+  .cap { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; fill: var(--muted); }
+  .lbl { font-size: 12px; fill: var(--fg); paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
+  .lbl-zone { stroke: var(--zone); }
+  .lbl-ask { fill: var(--ask); }
+  .num { font-family: var(--mono); font-size: 11px; font-weight: 500; fill: var(--muted); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.88rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .sw { width: 18px; height: 12px; border-radius: 2px; flex: none; }
+  .sw.ours { background: var(--ours-soft); border: 1.75px solid var(--ours); }
+  .sw.part { background: var(--surface); border: 1.25px solid var(--fg); }
+  .sw.in { height: 0; border-top: 3px solid var(--ask); border-radius: 0; }
+  .sw.ask { height: 0; border-top: 2px dashed var(--ask); border-radius: 0; }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 36px 48px; }
+  .cols > section { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 8px; }
+  li { color: var(--muted); }
+  li b { color: var(--fg); font-weight: 500; }
+  code { font-family: var(--mono); font-size: 0.86em; }
+
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 0.93rem; }
+  th, td { text-align: left; padding: 9px 14px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  td:last-child, th:last-child { padding-right: 0; }
+  td.who { white-space: nowrap; color: var(--muted); }
+  td.who.mine { color: var(--ours); font-weight: 500; }
+</style>
+
+</head>
+<body style="margin:0">
+<div class="page">
+  <div class="prose">
+    <h1>telepi: a phone client and a safe place for Pi to work</h1>
+    <p class="lede">telepi does not write an agent. It puts Pi Durable on the trusted side of your home machine, runs everything the agent does inside an OpenShell sandbox, and gives you a phone app for handing over work and answering when a boundary is about to be crossed.</p>
+  </div>
+
+  <figure class="arch">
+    <div class="legend">
+      <span><i class="sw ours"></i>written by telepi</span>
+      <span><i class="sw part"></i>an existing part, used as it is</span>
+      <span><i class="sw in"></i>the only inbound connection</span>
+      <span><i class="sw ask"></i>a refusal on its way to becoming an approval card</span>
+    </div>
+    <div class="scroll">
+      <svg viewBox="0 0 1500 690" role="img" aria-label="Architecture. The phone reaches the telepi server on the home machine through a private network; that is the only inbound connection. On the trusted side the telepi server talks to Pi Durable, which reads Pi's own login, model and skills files and calls the model provider. Pi Durable's tools run through an adapter in an OpenShell sandbox, one per task. The sandbox's supervisor refuses every connection the policy does not allow and adds credentials to the ones it does. Refusals travel back through the gateway to the telepi server, which shows them on the phone as approval cards.">
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="ah" d="M0 0 L10 5 L0 10 Z"/></marker>
+          <marker id="a-ask" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah-ask" d="M0 0 L10 5 L0 10 Z"/></marker>
+          <marker id="a-in" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto"><path class="ah-ask" d="M0 0 L10 5 L0 10 Z"/></marker>
+        </defs>
+
+        <!-- home machine -->
+        <rect class="host" x="470" y="40" width="760" height="630" rx="10"/>
+        <text class="cap" x="486" y="63">HOME MACHINE</text>
+
+        <!-- trusted side -->
+        <rect class="zone" x="490" y="80" width="330" height="500" rx="8"/>
+        <text class="cap" x="506" y="104">TRUSTED SIDE · KEYS AND STATE LIVE HERE</text>
+
+        <rect class="ours" x="510" y="120" width="290" height="120" rx="6"/>
+        <text class="t t-ours" x="655" y="150">telepi server</text>
+        <text class="s" x="655" y="174">sync, pairing, push, review screens</text>
+        <text class="s" x="655" y="192">turns sandbox refusals into cards</text>
+        <text class="tag" x="655" y="220">listens on loopback only</text>
+
+        <rect class="box" x="510" y="290" width="290" height="120" rx="6"/>
+        <text class="t" x="655" y="320">Pi Durable</text>
+        <text class="s" x="655" y="344">agent loop, checkpoints, restart-safe</text>
+        <text class="s" x="655" y="362">file and shell tools, extensions</text>
+        <text class="tag" x="655" y="390">@earendil-works/pi-durable</text>
+
+        <rect class="box" x="510" y="450" width="130" height="100" rx="6"/>
+        <text class="t t-sm" x="575" y="478">~/.pi/agent</text>
+        <text class="s s-sm" x="575" y="500">login, model,</text>
+        <text class="s s-sm" x="575" y="516">settings, skills</text>
+        <text class="tag" x="575" y="538">Pi's own files</text>
+
+        <rect class="ours" x="660" y="450" width="140" height="100" rx="6"/>
+        <text class="t t-sm t-ours" x="730" y="478">OpenShell adapter</text>
+        <text class="s s-sm" x="730" y="500">runs Durable's tools</text>
+        <text class="s s-sm" x="730" y="516">in the sandbox</text>
+        <text class="tag" x="730" y="538">glue, no logic</text>
+
+        <!-- openshell -->
+        <rect class="zone" x="850" y="80" width="360" height="570" rx="8"/>
+        <text class="cap" x="866" y="104">OPENSHELL · RUNS IN DOCKER</text>
+
+        <rect class="box" x="870" y="120" width="320" height="110" rx="6"/>
+        <text class="t" x="1030" y="150">Gateway</text>
+        <text class="s" x="1030" y="174">policy per sandbox, credential store</text>
+        <text class="s" x="1030" y="192">tells telepi what was refused</text>
+        <text class="tag" x="1030" y="216">NVIDIA OpenShell</text>
+
+        <rect class="sandbox" x="870" y="290" width="320" height="340" rx="6"/>
+        <text class="cap" x="886" y="616">SANDBOX · ONE PER TASK</text>
+
+        <rect class="box" x="890" y="330" width="280" height="90" rx="6"/>
+        <text class="t" x="1030" y="358">Supervisor</text>
+        <text class="s" x="1030" y="380">egress proxy, refuses by default</text>
+        <text class="s" x="1030" y="398">adds credentials to allowed requests</text>
+
+        <rect class="box" x="890" y="460" width="280" height="130" rx="6"/>
+        <text class="t" x="1030" y="488">Task workspace</text>
+        <text class="s" x="1030" y="512">git clone on the task's own branch</text>
+        <text class="s" x="1030" y="530">bash, read, edit, git, gh run here</text>
+        <text class="tag" x="1030" y="560">no keys · no host files · no network of its own</text>
+
+        <!-- outside, left -->
+        <rect class="box" x="30" y="40" width="170" height="70" rx="6"/>
+        <text class="t" x="115" y="70">Push service</text>
+        <text class="s" x="115" y="92">Apple, Google, Mozilla</text>
+
+        <rect class="ours" x="30" y="150" width="170" height="110" rx="6"/>
+        <text class="t t-ours" x="115" y="186">Phone</text>
+        <text class="s" x="115" y="210">telepi app (PWA)</text>
+        <text class="tag" x="115" y="238">cache, not source of truth</text>
+
+        <rect class="box" x="260" y="120" width="150" height="170" rx="6"/>
+        <text class="t" x="335" y="170">Private network</text>
+        <text class="s" x="335" y="196">Tailscale or</text>
+        <text class="s" x="335" y="214">Cloudflare Access</text>
+        <text class="tag" x="335" y="256">outside telepi's code</text>
+
+        <rect class="box" x="250" y="330" width="170" height="80" rx="6"/>
+        <text class="t" x="335" y="362">Model provider</text>
+        <text class="s" x="335" y="386">whichever Pi is logged in to</text>
+
+        <!-- outside, right -->
+        <rect class="box" x="1290" y="330" width="180" height="90" rx="6"/>
+        <text class="t" x="1380" y="362">Outside services</text>
+        <text class="s" x="1380" y="386">GitHub, GitLab, npm, …</text>
+        <text class="tag" x="1380" y="406">one policy preset each</text>
+
+        <!-- inbound -->
+        <path class="wire-in" d="M200 205 H258" marker-end="url(#a-in)"/>
+        <path class="wire-in" d="M410 205 H508" marker-end="url(#a-in)"/>
+        <text class="lbl lbl-ask" x="335" y="312" text-anchor="middle">HTTPS and WebSocket in</text>
+
+        <!-- push -->
+        <path class="wire" d="M510 135 H440 V75 H202" marker-end="url(#a)"/>
+        <path class="wire" d="M115 110 V148" marker-end="url(#a)"/>
+        <text class="lbl" x="322" y="66" text-anchor="middle">notification, no task content</text>
+
+        <!-- server and durable -->
+        <path class="wire" d="M600 240 V288" marker-end="url(#a)"/>
+        <path class="wire" d="M710 290 V242" marker-end="url(#a)"/>
+        <text class="lbl lbl-zone" x="592" y="269" text-anchor="end">tasks, messages</text>
+        <text class="lbl lbl-zone" x="718" y="269">events, usage</text>
+
+        <!-- pi files, adapter -->
+        <path class="wire" d="M575 450 V412" marker-end="url(#a)"/>
+        <text class="lbl lbl-zone" x="583" y="435">reads</text>
+        <path class="wire" d="M730 410 V448" marker-end="url(#a)"/>
+        <text class="lbl lbl-zone" x="738" y="435">tool call</text>
+
+        <!-- model -->
+        <path class="wire" d="M510 370 H422" marker-end="url(#a)"/>
+        <text class="lbl" x="335" y="432" text-anchor="middle">model calls; the key never leaves this side</text>
+
+        <!-- adapter to gateway -->
+        <path class="wire" d="M800 500 H835 V175 H868" marker-end="url(#a)"/>
+        <text class="lbl" x="829" y="338" text-anchor="middle" transform="rotate(-90 829 338)">tool calls and policy rules · gRPC, mutual TLS</text>
+
+        <!-- gateway and sandbox -->
+        <path class="wire" d="M960 230 V328" marker-end="url(#a)"/>
+        <text class="lbl lbl-zone" x="952" y="264" text-anchor="end">run, set policy</text>
+        <path class="wire-ask" d="M1100 330 V232" marker-end="url(#a-ask)"/>
+        <text class="lbl lbl-zone lbl-ask" x="1108" y="264">refused</text>
+
+        <!-- refusal to telepi -->
+        <path class="wire-ask" d="M870 145 H802" marker-end="url(#a-ask)"/>
+
+        <!-- workspace to supervisor -->
+        <path class="wire" d="M1030 460 V422" marker-end="url(#a)"/>
+        <text class="lbl" x="1038" y="445">every connection</text>
+
+        <!-- egress -->
+        <path class="wire" d="M1170 375 H1288" marker-end="url(#a)"/>
+        <text class="lbl" x="1380" y="446" text-anchor="middle">only hosts the policy allows;</text>
+        <text class="lbl" x="1380" y="463" text-anchor="middle">the token is added on the way out</text>
+      </svg>
+    </div>
+    <figcaption>Two boxes and the phone app are telepi's own. Everything that decides what the agent may do is someone else's tested part: Pi Durable runs the loop, OpenShell holds the boundary. The agent's commands never run on the trusted side, and the trusted side's keys never enter the sandbox.</figcaption>
+  </figure>
+
+  <figure class="path">
+    <h2>Where an approval comes from</h2>
+    <div class="scroll">
+      <svg viewBox="0 0 1280 170" role="img" aria-label="The approval path in six steps. The agent runs git push in the sandbox. The supervisor refuses because github.com is not in the policy. The gateway reports the refusal. telepi opens an approval card. You approve on the phone. telepi adds the rule to the policy and the command runs.">
+        <defs>
+          <marker id="p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="ah" d="M0 0 L10 5 L0 10 Z"/></marker>
+        </defs>
+        <g>
+          <rect class="box" x="25" y="30" width="180" height="110" rx="6"/>
+          <text class="num" x="39" y="50">1</text>
+          <text class="t t-sm" x="115" y="78">Agent runs</text>
+          <text class="t t-sm" x="115" y="96">git push</text>
+          <text class="tag" x="115" y="124">in the sandbox</text>
+
+          <rect class="box" x="235" y="30" width="180" height="110" rx="6"/>
+          <text class="num" x="249" y="50">2</text>
+          <text class="t t-sm" x="325" y="78">Supervisor refuses</text>
+          <text class="s s-sm" x="325" y="98">github.com is not in policy</text>
+          <text class="tag" x="325" y="124">OpenShell</text>
+
+          <rect class="box" x="445" y="30" width="180" height="110" rx="6"/>
+          <text class="num" x="459" y="50">3</text>
+          <text class="t t-sm" x="535" y="78">Gateway reports it</text>
+          <text class="s s-sm" x="535" y="98">host, port, which program</text>
+          <text class="tag" x="535" y="124">OpenShell</text>
+
+          <rect class="ours" x="655" y="30" width="180" height="110" rx="6"/>
+          <text class="num" x="669" y="50">4</text>
+          <text class="t t-sm t-ours" x="745" y="78">telepi opens a card</text>
+          <text class="s s-sm" x="745" y="98">and sends a notification</text>
+          <text class="tag" x="745" y="124">telepi server</text>
+
+          <rect class="b-ask" x="865" y="30" width="180" height="110" rx="6"/>
+          <text class="num" x="879" y="50">5</text>
+          <text class="t t-sm" x="955" y="78">You answer</text>
+          <text class="s s-sm" x="955" y="98">once, or for this project</text>
+          <text class="tag" x="955" y="124">phone</text>
+
+          <rect class="ours" x="1075" y="30" width="180" height="110" rx="6"/>
+          <text class="num" x="1089" y="50">6</text>
+          <text class="t t-sm t-ours" x="1165" y="78">Rule goes into policy</text>
+          <text class="s s-sm" x="1165" y="98">the command runs again</text>
+          <text class="tag" x="1165" y="124">telepi → gateway</text>
+        </g>
+        <path class="wire" d="M205 85 H233" marker-end="url(#p)"/>
+        <path class="wire" d="M415 85 H443" marker-end="url(#p)"/>
+        <path class="wire" d="M625 85 H653" marker-end="url(#p)"/>
+        <path class="wire" d="M835 85 H863" marker-end="url(#p)"/>
+        <path class="wire" d="M1045 85 H1073" marker-end="url(#p)"/>
+      </svg>
+    </div>
+    <figcaption>There is one source of approvals: the sandbox boundary. telepi does not guess which commands are dangerous. Whatever stays inside the sandbox needs no permission, and whatever tries to leave it is refused until you say otherwise. A denial is remembered for the task, an approval can be remembered for the project.</figcaption>
+  </figure>
+
+  <section class="prose" style="max-width: none;">
+    <h2>What each part does, and whose it is</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Job</th><th>Done by</th><th>Whose</th></tr></thead>
+        <tbody>
+          <tr><td>Hand over tasks, answer requests, read results and diffs on a phone</td><td>telepi app</td><td class="who mine">telepi</td></tr>
+          <tr><td>Device pairing, sync, notifications, the review of a finished task</td><td>telepi server</td><td class="who mine">telepi</td></tr>
+          <tr><td>Running Durable's tools inside the sandbox, turning refusals into cards</td><td>OpenShell adapter</td><td class="who mine">telepi</td></tr>
+          <tr><td>The agent loop, checkpoints, picking work back up after a crash</td><td>Pi Durable</td><td class="who">Earendil</td></tr>
+          <tr><td>Reading, writing and editing files, running commands</td><td>Durable's coding tools</td><td class="who">Earendil</td></tr>
+          <tr><td>Which model, which login, settings, skills, <code>AGENTS.md</code></td><td>Pi's own files and model layer</td><td class="who">Earendil</td></tr>
+          <tr><td>Isolation of files and processes, refusing network by default</td><td>OpenShell sandbox and supervisor</td><td class="who">NVIDIA</td></tr>
+          <tr><td>Keeping a service's token away from the agent, adding it to allowed requests</td><td>OpenShell providers</td><td class="who">NVIDIA</td></tr>
+          <tr><td>Access to GitHub, GitLab, a package registry</td><td>A policy preset and a provider, no code</td><td class="who">NVIDIA, NemoClaw presets</td></tr>
+          <tr><td>A new ability for the agent</td><td>A Durable extension, loaded at start</td><td class="who">Earendil's API</td></tr>
+          <tr><td>Reaching the home machine from outside</td><td>Tailscale or Cloudflare Access</td><td class="who">yours to choose</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="cols">
+    <section>
+      <h2>Changed from the earlier diagram</h2>
+      <ul>
+        <li><b>The tool-call judges are gone as a safety layer.</b> The pattern list and the planned model judges tried to recognise dangerous commands. The sandbox makes that unnecessary: a command can only do harm by leaving it. The pattern list remains as an opt-in.</li>
+        <li><b>No plugin system of telepi's own.</b> A service is a preset and a credential held by OpenShell; a capability is a Durable extension.</li>
+        <li><b>Publishing runs in the sandbox.</b> "Push branch" and "Open PR" run <code>git push</code> and the GitHub API call inside the sandbox, with a token the agent never sees. Both ask the first time in a project.</li>
+        <li><b>Deploy preview and the migration action are removed.</b></li>
+        <li><b>The plain Docker sandbox is removed.</b> One boundary, one story.</li>
+        <li><b>Model and login come from Pi.</b> No telepi-specific key or model list.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Not yet verified</h2>
+      <ul>
+        <li><b>Real github.com.</b> Git with a token the supervisor fills in works against a local stand-in over plain HTTP: the sandbox saw a placeholder, the server received the token. The same against <code>https://github.com</code> has not been run.</li>
+        <li><b>Read versus write on one service.</b> OpenShell has rules per HTTP method and path; telepi only uses whole-host rules so far.</li>
+        <li><b>MCP.</b> Pi publishes a standalone MCP client, <code>@earendil-works/pi-mcp</code>. Wrapping it as a Durable extension is not done.</li>
+        <li><b>OAuth logins.</b> API-key logins from Pi's files work; a subscription login that needs its token refreshed has not been tried.</li>
+        <li><b>A real phone behind Tailscale or Cloudflare Access</b>, and notifications on it.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Kept on purpose</h2>
+      <ul>
+        <li><b>The review.</b> A task ends with a summary, the changed files and a diff you can read before anything is published.</li>
+        <li><b>Approvals never queue offline.</b> A late yes could land on work that has moved on.</li>
+        <li><b>Content-free notifications.</b> The push service learns that something is waiting, not what.</li>
+        <li><b>The server is the source of truth.</b> The phone holds a cache.</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+</body>
+</html>
